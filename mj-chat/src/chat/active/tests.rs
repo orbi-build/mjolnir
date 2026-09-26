@@ -1732,6 +1732,12 @@ fn the_composer_footer_names_the_prefix_at_every_width() {
     }
 }
 
+#[test]
+fn composer_paste_hint_names_cmd_v_on_macos_and_ctrl_v_elsewhere() {
+    assert_eq!(composer_paste_hint(true), "Cmd-V paste");
+    assert_eq!(composer_paste_hint(false), "Ctrl-V paste");
+}
+
 /// `symbols = "ascii"` is for a Linux console or a locale without UTF-8. The
 /// composer's own hints were written out with a literal middle dot joining
 /// them, so splitting on the glyph set's separator found nothing under the
@@ -1763,7 +1769,10 @@ fn the_ascii_symbol_set_reaches_the_composers_own_footer_hints() {
 
     let idle = draw(&chat);
     assert!(idle.is_ascii(), "{idle:?}");
-    assert!(idle.contains("Ctrl-V paste"), "{idle:?}");
+    assert!(
+        idle.contains(composer_paste_hint(cfg!(target_os = "macos"))),
+        "{idle:?}"
+    );
 
     chat.queued_prompts.push_back(queued("queued-1", "next"));
     let queued_footer = draw(&chat);

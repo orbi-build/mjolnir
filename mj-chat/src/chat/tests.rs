@@ -226,14 +226,14 @@ fn kill_and_yank_preserve_images_and_renumber_copies() {
 }
 
 #[test]
-fn composer_renders_numbered_images_and_advertises_control_v() {
+fn composer_renders_numbered_images_and_advertises_platform_paste() {
     let mut chat = ChatState::new(&snapshot(), &[]);
     chat.set_prompt_images_supported(true);
     chat.handle_clipboard_content(ClipboardContent::Image(test_image()));
     chat.feedback.clear();
     let screen = test_support::drawn_transcript(&mut chat, 160, 30).join("\n");
     assert!(screen.contains("[image 1]"));
-    assert!(screen.contains("Ctrl-V paste"));
+    assert!(screen.contains(active::composer_paste_hint(cfg!(target_os = "macos"))));
     chat.handle_key(key(KeyCode::Backspace));
     let screen = test_support::drawn_transcript(&mut chat, 160, 30).join("\n");
     assert!(!screen.contains("[image 1]"));
