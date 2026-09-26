@@ -324,6 +324,14 @@ pub(crate) fn render_in(
     }
 }
 
+/// The composer footer's paste hint. macOS reads the clipboard — including a
+/// clipboard image — with Cmd-V; every other platform uses Ctrl-V. The
+/// platform is a parameter so a unit test can cover both strings without a
+/// macOS host.
+pub(crate) fn composer_paste_hint(macos: bool) -> &'static str {
+    if macos { "Cmd-V paste" } else { "Ctrl-V paste" }
+}
+
 /// Draws the one-row footer under the conversation: the reverse-i-search
 /// prompt when one is open, else the shared notice, else the hotkey hints
 /// for the composer.
@@ -365,7 +373,8 @@ pub(crate) fn render_chat_footer(
         queued_keys
     } else {
         format!(
-            "Tab pane{sep}Ctrl-V paste{sep}Enter send{sep}Ctrl-R history{sep}Shift-Enter newline"
+            "Tab pane{sep}{}{sep}Enter send{sep}Ctrl-R history{sep}Shift-Enter newline",
+            composer_paste_hint(cfg!(target_os = "macos"))
         )
     };
     let groups = theme::fit_prefixed_footer_items(
